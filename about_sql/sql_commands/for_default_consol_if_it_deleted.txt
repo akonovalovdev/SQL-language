@@ -1,3 +1,52 @@
+--------------------DELETE-------------------------------
+DELETE  FROM book; --таблица;
+
+DELETE FROM supply
+WHERE author IN(
+    SELECT author
+    FROM book
+    GROUP BY author
+    HAVING SUM(amount) >10
+);
+
+--------------------CREATE-------------------------------
+-- Создать таблицу заказ (ordering), куда включить авторов и названия тех книг,
+-- количество экземпляров которых в таблице book меньше 4. Для всех книг указать одинаковое количество экземпляров 5.
+CREATE TABLE ordering AS
+SELECT author, title, 5 AS amount
+FROM book
+WHERE amount < 4;
+
+-- Создать таблицу заказ (ordering), куда включить авторов и названия тех книг,
+-- количество экземпляров которых в таблице book меньше 4. Для всех книг указать
+-- одинаковое значение - среднее количество экземпляров книг в таблице book.
+
+CREATE TABLE ordering AS
+SELECT author, title,
+       (
+           SELECT ROUND(AVG(amount))
+           FROM book
+       ) AS amount
+FROM book
+WHERE amount < 4;
+
+SELECT * FROM ordering;
+
+DROP TABLE ordering;
+
+--------------------UPDATE-------------------------------
+UPDATE book
+SET price = 0.7 * price
+WHERE price > 200;
+SELECT * FROM book;
+
+
+UPDATE book
+SET amount = amount; -- buy,
+    --buy = 0;
+
+
+-------------------SELECTS-------------------------------
 SELECT name_genre AS Имя
 FROM genre;
 
@@ -48,7 +97,7 @@ WHERE (price < 500 OR price > 600) AND price * amount >= 5000;
 
 DROP TABLE book;
 
-CREATE TABLE book(
+CREATE TABLE book( -- supply (поставка)
     book_id SERIAL PRIMARY KEY,
     title VARCHAR(50),
     author VARCHAR(30),
@@ -75,6 +124,28 @@ VALUES ('Мастер и Маргарита', 'Булгаков М.А.',	670.99,
        ('Поэмы', 'Бехтерев С.С.', 460.00, 10),
        ('Капитанская дочка', 'Пушкин А.С.', 520.50, 7);
 
+INSERT INTO supply (title, author, price, amount)
+VALUES
+    ('Лирика', 'Пастернак Б.Л.', 518.99, 2),
+    ('Черный человек', 'Есенин С.А.', 570.20, 6),
+    ('Белая гвардия', 'Булгаков М.А.', 540.50, 7),
+    ('Идиот', 'Достоевский Ф.М.', 360.80, 3);
+
+INSERT INTO book (title, author, price, amount)
+SELECT title, author, price, amount
+FROM supply;
+
+SELECT * FROM supply;
+SELECT * FROM book;
+
+INSERT INTO book (title, author, price, amount)
+SELECT title, author, price, amount
+FROM supply
+WHERE title NOT IN (
+    SELECT title
+    FROM book
+);
+
 -- INSERT INTO book (title, author, price, amount)
 -- VALUES ('Капитанская дочка', 'Пушкин А.С.', 520.50, 7);
 INSERT INTO book (title, author, price, amount)
@@ -89,7 +160,7 @@ SELECT
     ROUND(AVG(price), 2) AS Средняя_цена,
     ROUND(SUM(price*amount), 2) AS Стоимость
 FROM book
-WHERE amount BETWEEN 5 and 14;
+WHERE amount BETWEEN 5 AND 14;
 
 SELECT title, price
 FROM book
@@ -184,3 +255,72 @@ WHERE title <> 'Идиот' AND title <> 'Белая гвардия'
 GROUP BY author
 HAVING SUM(price*amount) > 5000
 ORDER BY Стоимость DESC;
+
+SELECT title, author, price, amount
+FROM book
+WHERE price <> (
+    SELECT MAX(price)
+    FROM book
+) AND price <> (
+    SELECT MIN(price)
+    FROM book
+);
+
+SELECT
+    author,
+    title,
+    price
+FROM book
+WHERE price <= (
+    SELECT AVG(price)
+    FROM book
+) ORDER BY price DESC;
+
+SELECT title, author, amount
+FROM book
+WHERE ABS(amount - (SELECT AVG(amount) FROM book)) >3;
+
+SELECT
+    author,
+    title,
+    price
+FROM book
+WHERE price - (SELECT MIN(price) FROM book) <=150
+ORDER BY price;
+
+SELECT title, author, amount, price
+FROM book
+WHERE author IN (
+    SELECT author
+    FROM book
+    GROUP BY author
+    HAVING SUM(amount) >= 12
+);
+
+SELECT
+    author,
+    title,
+    amount
+FROM book
+WHERE amount IN(
+    SELECT amount
+    FROM book
+    GROUP BY amount
+    HAVING COUNT(amount) = 1
+);
+
+SELECT title, author, amount, price
+FROM book
+WHERE amount < ALL (
+    SELECT AVG(amount)
+    FROM book
+    GROUP BY author
+);
+
+SELECT title, author, amount,
+       (
+           SELECT AVG(amount)
+           FROM book
+       ) AS Среднее_количество
+FROM book
+WHERE abs(amount - (SELECT AVG(amount) FROM book)) >3;
