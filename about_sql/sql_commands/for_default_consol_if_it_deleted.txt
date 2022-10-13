@@ -1,5 +1,5 @@
 --------------------DELETE-------------------------------
-DELETE  FROM book; --таблица;
+DELETE FROM book; --таблица;
 
 DELETE FROM supply
 WHERE author IN(
@@ -55,8 +55,6 @@ SET amount = amount; -- buy,
 
 
 -------------------SELECTS-------------------------------
-SELECT name_genre AS Имя
-FROM genre;
 
 -- Вывести из таблицы trip информацию о командировках тех сотрудников, фамилия которых
 -- заканчивается на букву «а», в отсортированном по убыванию даты последнего дня командировки виде.
@@ -78,6 +76,59 @@ FROM trip
 WHERE city = 'Москва'
 GROUP BY name
 ORDER BY name;
+
+-- Для каждого города посчитать, сколько раз сотрудники в нем были.
+-- Информацию вывести в отсортированном в алфавитном порядке по названию городов.
+-- Вычисляемый столбец назвать Количество.
+SELECT
+    city,
+    COUNT(city) AS Количество
+FROM trip
+GROUP BY city
+ORDER BY city;
+
+SELECT *
+FROM trip
+ORDER BY  date_first
+LIMIT 3;
+
+SELECT
+    city,
+    COUNT(city) AS Количество
+FROM trip
+GROUP BY city
+ORDER BY Количество DESC
+LIMIT 2;
+
+-- Вывести информацию о командировках сотрудника(ов), которые были самыми короткими по времени.
+-- В результат включить столбцы name, city, date_first, date_last.
+SELECT
+    name,
+    city,
+    date_first,
+    date_last
+FROM trip
+WHERE date_last - date_first = (
+    SELECT
+        MIN(date_last - date_first)
+    FROM trip
+);
+
+SELECT
+    name,
+    city,
+    date_first,
+    date_last
+FROM trip
+WHERE EXTRACT(MONTH FROM date_first) = EXTRACT(MONTH FROM date_last)
+ORDER BY city, name;
+
+SELECT
+          TO_CHAR(date_first, 'Month') AS Месяц,
+    COUNT(EXTRACT(MONTH FROM date_first)) AS Количество
+FROM trip
+GROUP BY Месяц
+ORDER BY Количество DESC, Месяц;
 
 SELECT title, amount, price,
        ROUND(CASE WHEN amount < 4  THEN price*0.5 ELSE price*0.7 END, 2) AS sale
@@ -132,13 +183,6 @@ CREATE TABLE book( -- supply (поставка)
     amount INT
 );
 
-CREATE TABLE book(
-                     book_id SERIAL PRIMARY KEY,
-                     title TEXT,
-                     author TEXT,
-                     price DECIMAL(8,2),
-                     amount INT
-);
 INSERT INTO book (title, author, price, amount)
 VALUES ('Мастер и Маргарита', 'Булгаков М.А.',	670.99,	3),
        ('Белая гвардия', 'Булгаков М.А.', 540.50, 5),
