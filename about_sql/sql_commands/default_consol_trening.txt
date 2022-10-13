@@ -1,0 +1,68 @@
+-- user
+-- id | firstname | lastname | birth
+-- 1  | Ivan      | Petrov   | 1996-05-01
+-- 2  | Anna      | Petrova  | 1999-06-01
+-- // purchase
+-- sku   | price | user_id | date
+-- 11111, 5500 , 1      , 2021-02-15
+-- 22222, 4000 , 1      , 2021-02-14
+-- 33333, 8000 , 2      , 2021-03-01
+-- 44444, 400  , 2      , 2021-03-02
+-- // ban_list
+-- user_id | date
+-- 1       | 2021-03-08
+
+DROP TABLE purchase;
+
+CREATE TABLE ban_list(
+                      user_id INT REFERENCES users(id) not null,
+                      date DATE
+);
+
+CREATE TABLE purchase(
+                      sku int,
+                      price DECIMAL(10,2),
+                      user_id INT REFERENCES users(id) not null,
+                      date DATE
+);
+
+INSERT INTO purchase (sku, price, user_id, date)
+VALUES  (11111, 5500, 1, '2021-02-15'),
+        (22222, 4000, 1, '2021-02-14'),
+        (33333, 8000, 2, '2021-03-01'),
+        (44444, 400, 2, '2021-03-02');
+
+INSERT INTO ban_list (user_id, date)
+VALUES (1, '2021-03-08');
+
+CREATE TABLE users(
+    id SERIAL PRIMARY KEY,
+    firstname VARCHAR,
+    lastname VARCHAR,
+    birth DATE
+);
+
+SELECT id, firstname, lastname, sku FROM users JOIN purchase ON id = user_id
+WHERE EXTRACT(MONTH FROM date) IN(2,3);
+
+
+INSERT INTO purchase (sku, price, user_id, date)
+VALUES  (66666, 100, 5, '2021-03-20');
+
+
+-- SELECT
+--     DISTINCT id,
+--     firstname,
+--     u.lastname,
+--     p.sku
+-- from users as u
+-- join purchase as p on u.id = p.user_id
+-- where EXTRACT(MONTH FROM date) = 2;
+
+SELECT
+    id,
+    firstname,
+    lastname,
+    sku
+FROM users JOIN purchase ON id = user_id
+WHERE EXTRACT(MONTH FROM date) = 2;
