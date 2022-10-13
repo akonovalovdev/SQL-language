@@ -8,6 +8,15 @@ WHERE author IN(
     GROUP BY author
     HAVING SUM(amount) >10
 );
+--------------------ALIAS--------------------------------
+
+SELECT  f.name, f.number_plate, f.violation,
+        CASE
+            WHEN f.sum_fine = tv.sum_fine THEN 'Стандартная сумма штрафа'
+            WHEN f.sum_fine < tv.sum_fine THEN 'Уменьшенная сумма штрафа' ELSE 'Увеличенная сумма штрафа'
+            END AS description
+FROM  fine f, traffic_violation tv
+WHERE tv.violation = f.violation and f.sum_fine IS NOT Null;
 
 --------------------CREATE-------------------------------
 -- Создать таблицу заказ (ordering), куда включить авторов и названия тех книг,
@@ -42,6 +51,53 @@ SELECT * FROM ordering;
 
 DROP TABLE ordering;
 
+
+
+CREATE TABLE fine
+(
+    fine_id        SERIAL PRIMARY KEY,
+    name           VARCHAR(30),
+    number_plate   VARCHAR(6),
+    violation      VARCHAR(50),
+    sum_fine       DECIMAL(8, 2),
+    date_violation DATE,
+    date_payment   DATE
+);
+CREATE TABLE traffic_violation
+(
+    violation_id SERIAL PRIMARY KEY,
+    violation    VARCHAR(50),
+    sum_fine     DECIMAL(8, 2)
+);
+
+INSERT INTO fine(name, number_plate, violation, sum_fine, date_violation, date_payment)
+values ('Баранов П.Е.', 'P523BT', 'Превышение скорости(от 40 до 60)', 500.00, '2020-01-12', '2020-01-17'),
+       ('Абрамова К.А.', 'О111AB', 'Проезд на запрещающий сигнал', 1000.00, '2020-01-14', '2020-02-27'),
+       ('Яковлев Г.Р.', 'T330TT', 'Превышение скорости(от 20 до 40)', 500.00, '2020-01-23', '2020-02-23'),
+       ('Яковлев Г.Р.', 'M701AA', 'Превышение скорости(от 20 до 40)', NULL, '2020-01-12', NULL),
+       ('Колесов С.П.', 'K892AX', 'Превышение скорости(от 20 до 40)', NULL, '2020-02-01', NULL),
+       ('Баранов П.Е.', 'P523BT', 'Превышение скорости(от 40 до 60)', NULL, '2020-02-14', NULL),
+       ('Абрамова К.А.', 'О111AB', 'Проезд на запрещающий сигнал', NULL, '2020-02-23', NULL),
+       ('Яковлев Г.Р.', 'T330TT', 'Проезд на запрещающий сигнал', NULL, '2020-03-03', NULL);
+
+INSERT INTO traffic_violation(violation, sum_fine)
+VALUES ('Превышение скорости(от 20 до 40)', 500),
+       ('Превышение скорости(от 40 до 60)', 1000),
+       ('Проезд на запрещающий сигнал', 1000);
+
+SELECT * FROM fine; -- , traffic_violation;
+
+DROP TABLE fine;
+
+CREATE TABLE back_payment AS (SELECT
+                                  name, number_plate, violation, sum_fine, date_violation
+                              FROM fine
+                              WHERE date_payment IS NULL
+);
+
+SELECT * FROM back_payment;
+
+
 --------------------UPDATE-------------------------------
 UPDATE book
 SET price = 0.7 * price
@@ -53,8 +109,18 @@ UPDATE book
 SET amount = amount; -- buy,
     --buy = 0;
 
+UPDATE fine f
+SET sum_fine =  tv.sum_fine
+FROM traffic_violation tv
+-- WHERE f.sum_fine is NULL;
+WHERE tv.violation = f.violation and f.sum_fine IS Null;
+SELECT * FROM fine;
 
--------------------SELECTS-------------------------------
+-------------------SELECTS-------------------------------f
+
+SELECT name, number_plate, violation, count(*)
+FROM fine
+GROUP BY name, number_plate, violation;
 
 -- Вывести из таблицы trip информацию о командировках тех сотрудников, фамилия которых
 -- заканчивается на букву «а», в отсортированном по убыванию даты последнего дня командировки виде.
