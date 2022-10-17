@@ -20,3 +20,11 @@ package main
 // Команда выводящая все установленные конфигурации индексов
 // SELECT amname FROM pg_am;
 // по умолчанию:1 btree, 2 hash, 3 gist, 4 gin, 5 spgist, 6 brin
+
+// Команда выводит все созданные внешние ключи в указанной таблице
+// SELECT *
+// FROM information_schema.KEY_COLUMN_USAGE
+// WHERE TABLE_SCHEMA ='public' AND TABLE_NAME ='users' AND
+//        CONSTRAINT_NAME <>'PRIMARY';
+
+// Удаление внешнего ключа ALTER TABLE purchase DROP CONSTRAINT fkey_name;

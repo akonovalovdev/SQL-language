@@ -15,16 +15,24 @@
 DROP TABLE purchase;
 
 CREATE TABLE ban_list(
-                      user_id INT REFERENCES users(id) not null,
-                      date DATE
+                         user_id INT REFERENCES users(id) not null,
+                         date DATE
 );
 
 CREATE TABLE purchase(
-                      sku int,
-                      price DECIMAL(10,2),
-                      user_id INT REFERENCES users(id) not null,
-                      date DATE
+                         sku int,
+                         price DECIMAL(10,2),
+                         user_id INT REFERENCES users(id),
+                         date DATE
 );
+
+ALTER TABLE purchase DROP CONSTRAINT purchase_user_id_fkey;
+
+INSERT INTO purchase (sku, price, user_id, date)
+VALUES  (55555, 7000, 8, '2021-03-20'),
+        (66666, 100, 5, '2021-03-20');
+
+DROP TABLE purchase;
 
 INSERT INTO purchase (sku, price, user_id, date)
 VALUES  (11111, 5500, 1, '2021-02-15'),
@@ -36,18 +44,27 @@ INSERT INTO ban_list (user_id, date)
 VALUES (1, '2021-03-08');
 
 CREATE TABLE users(
-    id SERIAL PRIMARY KEY,
-    firstname VARCHAR,
-    lastname VARCHAR,
-    birth DATE
+                      id SERIAL PRIMARY KEY,
+                      firstname VARCHAR,
+                      lastname VARCHAR,
+                      birth DATE
 );
 
 SELECT id, firstname, lastname, sku FROM users JOIN purchase ON id = user_id
 WHERE EXTRACT(MONTH FROM date) IN(2,3);
 
+SELECT id, firstname, lastname, sku FROM users RIGHT OUTER JOIN purchase ON id = user_id;
+
+SELECT id, firstname, lastname, sku FROM users RIGHT JOIN purchase ON id = user_id;
+
+SELECT id, firstname, lastname, sku FROM users LEFT OUTER JOIN purchase ON id = user_id;
+
+SELECT id, firstname, lastname, sku FROM users LEFT JOIN purchase ON id = user_id;
+
 
 INSERT INTO purchase (sku, price, user_id, date)
-VALUES  (66666, 100, 5, '2021-03-20');
+VALUES  (55555, 7000, 8, '2021-03-20'),
+        (66666, 100, 5, '2021-03-20');
 
 
 -- SELECT
@@ -66,3 +83,8 @@ SELECT
     sku
 FROM users JOIN purchase ON id = user_id
 WHERE EXTRACT(MONTH FROM date) = 2;
+
+SELECT *
+FROM information_schema.KEY_COLUMN_USAGE
+WHERE TABLE_SCHEMA ='public' AND TABLE_NAME ='purchase' AND
+        CONSTRAINT_NAME <>'PRIMARY';
