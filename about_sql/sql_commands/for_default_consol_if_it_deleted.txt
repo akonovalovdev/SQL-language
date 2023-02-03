@@ -46,7 +46,6 @@ WHERE (price < 500 OR price > 600) AND price * amount >= 5000;
 --            AS new_price
 -- FROM book;
 
-
 DROP TABLE book;
 
 CREATE TABLE book(
@@ -64,12 +63,62 @@ CREATE TABLE book(
                      price DECIMAL(8,2),
                      amount INT
 );
-
 INSERT INTO book (title, author, price, amount)
 VALUES ('Мастер и Маргарита', 'Булгаков М.А.',	670.99,	3),
        ('Белая гвардия', 'Булгаков М.А.', 540.50, 5),
        ('Идиот', 'Достоевский Ф.М.', 460.00, 10),
-       ('Братья Карамазовы', 'Достоевский Ф.М.', 799.01, 2);
+       ('Братья Карамазовы', 'Достоевский Ф.М.', 799.01, 2),
+       ('Стихотворения и поэмы',	'Есенин С.А.',	650.00,	15),
+       ('', 'Иванов С.С.',	50.00,	10),
+       ('Дети полуночи', 'Рушди Салман', 950.00, 5),
+       ('Лирика', 'Гумилев Н.С.', 460.00, 10),
+       ('Поэмы', 'Бехтерев С.С.', 460.00, 10),
+       ('Капитанская дочка', 'Пушкин А.С.', 520.50, 7);
 
-INSERT INTO book (title, author, price, amount)
-VALUES ('Стихотворения и поэмы', 'Есенин С.А.',	650.00,	15);
+-- INSERT INTO book (title, author, price, amount)
+-- VALUES ('Капитанская дочка', 'Пушкин А.С.', 520.50, 7);
+
+
+SELECT title, amount
+FROM book
+WHERE amount BETWEEN 5 AND 14;
+
+SELECT title, price
+FROM book
+WHERE author IN ('Булгаков М.А.', 'Достоевский Ф.М.');
+
+SELECT
+    title,
+    author
+FROM book
+WHERE (price BETWEEN 540.50 AND 800) AND amount IN(2,3,5,7);
+
+SELECT title, author, price
+FROM book
+ORDER BY title;
+
+SELECT author, title, amount AS Количество
+FROM book
+WHERE price < 750
+ORDER BY author, amount DESC;
+
+SELECT
+    author,
+    title
+FROM book
+WHERE amount BETWEEN 2 AND 14
+ORDER BY author DESC, title
+
+SELECT title
+FROM book
+WHERE title LIKE 'Б%';
+/* эквивалентное условие
+title LIKE 'б%'
+*/
+
+SELECT
+    title,
+    author
+FROM book
+WHERE title LIKE '_% _%' AND(author LIKE '%С.%' OR author LIKE '%С.')
+ORDER BY title
