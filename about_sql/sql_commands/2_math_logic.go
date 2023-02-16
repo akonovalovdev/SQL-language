@@ -6,6 +6,7 @@ package main
  В SQL реализована возможность заносить в поле значение в зависимости от условия.
  Для этого используется функция IF():
 
+ mySQL
  IF(логическое_выражение, выражение_1, выражение_2)
 
  Функция вычисляет логическое_выражение, если оно истина – в поле заносится значение выражения_1,
@@ -26,4 +27,14 @@ package main
 // SELECT title, amount, price,
 //    ROUND(IF(amount < 4, price * 0.5, IF(amount < 11, price * 0.7, price * 0.9)), 2) AS sale,
 //    IF(amount < 4, 'скидка 50%', IF(amount < 11, 'скидка 30%', 'скидка 10%')) AS Ваша_скидка
+// FROM book;
+
+/*
+ В PostgreSQL та же самая задача решается  иначе
+ case when <условие> then <выражение_если_условие_истинно> else <выражение_если_условие_ложно> end
+*/
+// Пример:
+//
+// SELECT title, amount, price,
+//    ROUND(CASE WHEN amount < 4  THEN price*0.5 ELSE price*0.7 END, 2) AS sale
 // FROM book;
