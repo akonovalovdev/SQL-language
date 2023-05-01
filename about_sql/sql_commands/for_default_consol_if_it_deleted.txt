@@ -85,6 +85,12 @@ SELECT title, amount
 FROM book
 WHERE amount BETWEEN 5 AND 14;
 
+SELECT
+    ROUND(AVG(price), 2) AS Средняя_цена,
+    ROUND(SUM(price*amount), 2) AS Стоимость
+FROM book
+WHERE amount BETWEEN 5 and 14;
+
 SELECT title, price
 FROM book
 WHERE author IN ('Булгаков М.А.', 'Достоевский Ф.М.');
@@ -111,6 +117,14 @@ FROM book
 WHERE amount BETWEEN 2 AND 14
 ORDER BY author DESC, title;
 
+SELECT author,
+       MIN(price) AS Минимальная_цена,
+       MAX(price) AS Максимальная_цена
+FROM book
+GROUP BY author
+HAVING SUM(price * amount) > 5000
+ORDER BY Минимальная_цена DESC;
+
 SELECT title
 FROM book
 WHERE title LIKE 'Б%';
@@ -136,6 +150,14 @@ SELECT author, sum(amount), count(amount), count(*)
 FROM book
 GROUP BY author;
 
+SELECT author,
+       MIN(price) AS Минимальная_цена,
+       MAX(price) AS Максимальная_цена
+FROM book
+WHERE author <> 'Есенин С.А.'
+GROUP BY author
+HAVING SUM(amount) > 10;
+
 SELECT
     author AS Автор,
         COUNT(title) AS Различных_книг,
@@ -153,3 +175,12 @@ SELECT
     ROUND(AVG(DISTINCT price),2) AS Средняя_цена
 FROM book;
 -- GROUP BY author;
+
+SELECT
+    author,
+    SUM(price*amount) AS Стоимость
+FROM book
+WHERE title <> 'Идиот' AND title <> 'Белая гвардия'
+GROUP BY author
+HAVING SUM(price*amount) > 5000
+ORDER BY Стоимость DESC;
