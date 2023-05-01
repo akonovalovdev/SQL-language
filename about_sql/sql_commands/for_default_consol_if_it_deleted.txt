@@ -67,7 +67,7 @@ INSERT INTO book (title, author, price, amount)
 VALUES ('Мастер и Маргарита', 'Булгаков М.А.',	670.99,	3),
        ('Белая гвардия', 'Булгаков М.А.', 540.50, 5),
        ('Идиот', 'Достоевский Ф.М.', 460.00, 10),
-       ('Братья Карамазовы', 'Достоевский Ф.М.', 799.01, 2),
+       ('Братья Карамазовы', 'Достоевский Ф.М.', 799.01, 3),
        ('Стихотворения и поэмы',	'Есенин С.А.',	650.00,	15),
        ('', 'Иванов С.С.',	50.00,	10),
        ('Дети полуночи', 'Рушди Салман', 950.00, 5),
@@ -77,7 +77,9 @@ VALUES ('Мастер и Маргарита', 'Булгаков М.А.',	670.99,
 
 -- INSERT INTO book (title, author, price, amount)
 -- VALUES ('Капитанская дочка', 'Пушкин А.С.', 520.50, 7);
-
+INSERT INTO book (title, author, price, amount)
+VALUES ('Игрок', 'Достоевский Ф.М.', 480.50, 10),
+       ('Черный человек','Есенин С.А.', Null, Null);
 
 SELECT title, amount
 FROM book
@@ -107,7 +109,7 @@ SELECT
     title
 FROM book
 WHERE amount BETWEEN 2 AND 14
-ORDER BY author DESC, title
+ORDER BY author DESC, title;
 
 SELECT title
 FROM book
@@ -121,4 +123,33 @@ SELECT
     author
 FROM book
 WHERE title LIKE '_% _%' AND(author LIKE '%С.%' OR author LIKE '%С.')
-ORDER BY title
+ORDER BY title;
+
+SELECT DISTINCT amount
+FROM book;
+
+SELECT author, MIN(price) AS min_price,  count(*), MAX(price) AS max_price, AVG(price) AS СРЕДНЕЕ
+FROM book
+GROUP BY author;
+
+SELECT author, sum(amount), count(amount), count(*)
+FROM book
+GROUP BY author;
+
+SELECT
+    author AS Автор,
+        COUNT(title) AS Различных_книг,
+        SUM(amount) AS Количество_экземпляров
+FROM book
+GROUP BY author;
+
+SELECT SUM(amount) AS Количество,
+       SUM(price * amount) AS Стоимость
+FROM book;
+
+SELECT
+    MIN(price) AS Минимальная_цена,
+    MAX(price) AS Максимальная_цена,
+    ROUND(AVG(DISTINCT price),2) AS Средняя_цена
+FROM book;
+-- GROUP BY author;
