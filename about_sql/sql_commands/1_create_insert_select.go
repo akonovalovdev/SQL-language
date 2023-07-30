@@ -75,3 +75,12 @@ package main
 // Пример
 // SELECT name_genre AS Имя
 // FROM genre;
+
+/*
+ SELECT ВАРИАНТ 4 с указанием условия выборки WHERE
+ Запрос:
+
+ SELECT title, author, price * amount AS total
+ FROM book
+ WHERE price * amount > 4000;
+*/
